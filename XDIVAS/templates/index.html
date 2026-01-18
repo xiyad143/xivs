@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 IVAS SMS Analytics | Live Dashboard</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Particle.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Dynamic CSS Variables based on theme */
+        :root {
+            --primary: {{ colors.primary }};
+            --secondary: {{ colors.secondary }};
+            --accent: {{ colors.accent }};
+            --success: {{ colors.success }};
+            --warning: {{ colors.warning }};
+            --danger: {{ colors.danger }};
+            --dark: {{ colors.dark }};
+            --card: {{ colors.card }};
+            --text: {{ colors.text }};
+            --muted: {{ colors.muted }};
+            
+            /* Platform specific */
+            --facebook: {{ platform_colors.facebook }};
+            --whatsapp: {{ platform_colors.whatsapp }};
+            --instagram: {{ platform_colors.instagram }};
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--dark) 0%, #000000 100%);
+            --gradient-card: linear-gradient(145deg, var(--card) 0%, rgba(255,255,255,0.05) 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--gradient-dark);
+            color: var(--text);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--primary) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--secondary) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, var(--accent) 0%, transparent 50%);
+            animation: gradientShift 20s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        
+        .float-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            left: 5%;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .float-2 {
+            width: 200px;
+            height: 200px;
+            background: var(--secondary);
+            bottom: 20%;
+            right: 10%;
+            animation: float 20s ease-in-out infinite reverse;
+        }
+        
+        .float-3 {
+            width: 150px;
+            height: 150px;
+            background: var(--accent);
+            top: 50%;
+            left: 80%;
+            animation: float 25s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .dashboard-header {
+            background: rgba(20, 20, 32, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInDown 0.8s ease-out;
+        }
+        
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            animation: headerGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes headerGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Stat Cards - Enhanced */
+        .stat-card {
+            background: var(--gradient-card);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            height: 100%;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 50px rgba(var(--primary-rgb), 0.3);
+            border-color: var(--primary);
+        }
+        
+        .stat-card.active {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(var(--primary-rgb), 0.2);
+            border-color: var(--primary);
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .facebook-icon {
+            background: {{ platform_gradients.facebook }};
+            box-shadow: 0 10px 20px rgba(24, 119, 242, 0.3);
+        }
+        
+        .whatsapp-icon {
+            background: {{ platform_gradients.whatsapp }};
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        .instagram-icon {
+            background: {{ platform_gradients.instagram }};
+            box-shadow: 0 10px 20px rgba(228, 64, 95, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 10px 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: countUp 1s ease-out;
+        }
+        
+        @keyframes countUp {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Progress Bars */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            position: relative;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Live SMS Table */
+        .sms-table-container {
+            background: rgba(20, 20, 32, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .sms-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .sms-table th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 15px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sms-table td {
+            padding: 20px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+        
+        .sms-table tr {
+            animation: slideInRight 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .sms-table tr:nth-child(1) { animation-delay: 0.1s; }
+        .sms-table tr:nth-child(2) { animation-delay: 0.2s; }
+        .sms-table tr:nth-child(3) { animation-delay: 0.3s; }
+        .sms-table tr:nth-child(4) { animation-delay: 0.4s; }
+        .sms-table tr:nth-child(5) { animation-delay: 0.5s; }
+        
+        .sms-table tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.01);
+        }
+        
+        /* Platform Badges */
+        .badge-platform {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-platform::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .badge-platform:hover::before {
+            left: 100%;
+        }
+        
+        .badge-platform:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .badge-facebook {
+            background: {{ platform_gradients.facebook }};
+            color: white;
+            border: 2px solid rgba(24, 119, 242, 0.5);
+        }
+        
+        .badge-whatsapp {
+            background: {{ platform_gradients.whatsapp }};
+            color: white;
+            border: 2px solid rgba(37, 211, 102, 0.5);
+        }
+        
+        .badge-instagram {
+            background: {{ platform_gradients.instagram }};
+            color: white;
+            border: 2px solid rgba(228, 64, 95, 0.5);
+        }
+        
+        /* Country Flags */
+        .country-flag {
+            width: 30px;
+            height: 22px;
+            border-radius: 4px;
+            margin-right: 10px;
+            object-fit: cover;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .country-flag:hover {
+            transform: scale(1.2) rotate(5deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Charts Container */
+        .chart-container {
+            background: rgba(20, 20, 32, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            height: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        /* Buttons */
+        .btn-glow {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+        
+        .btn-glow:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 30px rgba(var(--primary-rgb), 0.4);
+        }
+        
+        /* Connection Status */
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .status-connected {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success), 0 0 20px var(--success);
+        }
+        
+        .status-disconnected {
+            background: var(--danger);
+            box-shadow: 0 0 10px var(--danger), 0 0 20px var(--danger);
+        }
+        
+        /* Theme Selector */
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-btn:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .theme-btn.active {
+            transform: scale(1.2);
+            border-color: white;
+            box-shadow: 0 0 20px white;
+        }
+        
+        .theme-neon { background: #00ff88; }
+        .theme-ocean { background: #00b4d8; }
+        .theme-sunset { background: #ff6b35; }
+        .theme-cyber { background: #00ff9d; }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+        
+        .toast-notification {
+            background: rgba(20, 20, 32, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(100%);
+            animation: slideInRight 0.5s ease-out forwards;
+            max-width: 350px;
+        }
+        
+        .toast-notification.hide {
+            animation: slideOutRight 0.5s ease-out forwards;
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: var(--secondary);
+            border-bottom-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* SMS Entry Animation */
+        .sms-entry {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        /* Counter Animation */
+        .counter {
+            animation: countUp 1s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 10px;
+            }
+            
+            .dashboard-header {
+                padding: 20px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .sms-table-container {
+                padding: 15px;
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            border: 2px solid var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="float-1 floating-element"></div>
+    <div class="float-2 floating-element"></div>
+    <div class="float-3 floating-element"></div>
+    
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+        <div class="theme-btn theme-neon active" data-theme="neon" title="Neon Theme"></div>
+        <div class="theme-btn theme-ocean" data-theme="ocean" title="Ocean Theme"></div>
+        <div class="theme-btn theme-sunset" data-theme="sunset" title="Sunset Theme"></div>
+        <div class="theme-btn theme-cyber" data-theme="cyber" title="Cyber Theme"></div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 mb-3">
+                        <span class="glow-text">🎯 IVAS SMS Analytics</span>
+                    </h1>
+                    <p class="lead mb-0 text-light">
+                        <i class="fas fa-bolt me-2 animate__animated animate__pulse animate__infinite"></i>
+                        <span class="realtime-indicator">⚡ LIVE</span> 
+                        Real-time monitoring of Facebook, WhatsApp & Instagram SMS
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex flex-column align-items-end gap-3">
+                        <div class="connection-status" id="connectionStatus">
+                            <span class="status-indicator status-disconnected"></span>
+                            <span id="connectionText">Connecting...</span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fas fa-clock me-2"></i>
+                            <span id="lastUpdated">--:--:--</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn-glow btn-sm" onclick="refreshData()">
+                                <i class="fas fa-sync-alt me-2"></i> Refresh
+                            </button>
+                            <button class="btn-glow btn-sm btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                                <i class="fas fa-play me-2"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card" data-platform="facebook">
+                    <div class="stat-icon facebook-icon animate__animated animate__pulse">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">Facebook SMS</h5>
+                    <div class="stat-number counter" id="facebookCount">0</div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill facebook-progress" style="width: 0%; background: {{ platform_gradients.facebook }};"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted" id="facebookPercentage">0%</small>
+                            <small class="text-muted" id="facebookRate">0/min</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="stat-card" data-platform="whatsapp">
+                    <div class="stat-icon whatsapp-icon animate__animated animate__pulse">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">WhatsApp SMS</h5>
+                    <div class="stat-number counter" id="whatsappCount">0</div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill whatsapp-progress" style="width: 0%; background: {{ platform_gradients.whatsapp }};"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted" id="whatsappPercentage">0%</small>
+                            <small class="text-muted" id="whatsappRate">0/min</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="stat-card" data-platform="instagram">
+                    <div class="stat-icon instagram-icon animate__animated animate__pulse">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">Instagram SMS</h5>
+                    <div class="stat-number counter" id="instagramCount">0</div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill instagram-progress" style="width: 0%; background: {{ platform_gradients.instagram }};"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted" id="instagramPercentage">0%</small>
+                            <small class="text-muted" id="instagramRate">0/min</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row g-4">
+            <!-- Left Column: Live SMS Table -->
+            <div class="col-lg-8">
+                <div class="sms-table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-stream me-2"></i> Live SMS Stream
+                            <span class="badge bg-primary ms-2 animate__animated animate__pulse animate__infinite" id="totalSms">0</span>
+                        </h4>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-primary active" onclick="filterSMS('all')">
+                                <i class="fas fa-globe me-1"></i> All
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="filterSMS('facebook')">
+                                <i class="fab fa-facebook me-1"></i> Facebook
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="filterSMS('whatsapp')">
+                                <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="filterSMS('instagram')">
+                                <i class="fab fa-instagram me-1"></i> Instagram
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="sms-table">
+                            <thead>
+                                <tr>
+                                    <th>Platform</th>
+                                    <th>Country</th>
+                                    <th>SID</th>
+                                    <th>Phone</th>
+                                    <th>Message</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="smsTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="loading-spinner mx-auto mb-3"></div>
+                                        <p class="text-muted animate__animated animate__pulse">Connecting to real-time stream...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Charts -->
+            <div class="col-lg-4">
+                <!-- Platform Distribution -->
+                <div class="chart-container mb-4">
+                    <h5 class="mb-4">
+                        <i class="fas fa-chart-pie me-2"></i> Platform Distribution
+                    </h5>
+                    <div style="height: 250px;">
+                        <canvas id="platformChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Countries -->
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="fas fa-globe-americas me-2"></i> Top Countries
+                    </h5>
+                    <div style="height: 250px;">
+                        <canvas id="countryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Row -->
+        <div class="row g-4 mt-4">
+            <!-- Hourly Activity -->
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="fas fa-chart-line me-2"></i> Hourly Activity
+                    </h5>
+                    <div style="height: 300px;">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Dashboard -->
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h5 class="mb-4">
+                        <i class="fas fa-analytics me-2"></i> Real-time Analytics
+                    </h5>
+                    <div id="analyticsDashboard">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="stat-card-sm">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-bolt text-warning me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">SMS Rate</h6>
+                                            <h4 id="smsRate" class="mb-0">0/min</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card-sm">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-globe text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">Countries</h6>
+                                            <h4 id="countryCount" class="mb-0">0</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="stat-card-sm">
+                                    <h6 class="mb-3">Peak Hours</h6>
+                                    <div id="peakHours" class="text-muted">
+                                        Loading...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.js"></script>
+    
+    <script>
+        // Global variables
+        let socket = null;
+        let currentFilter = 'all';
+        let autoRefresh = true;
+        let charts = {};
+        let allSmsData = [];
+        let isConnected = false;
+        let currentTheme = '{{ theme }}';
+        
+        // Initialize when page loads
+        $(document).ready(function() {
+            initializeCharts();
+            connectWebSocket();
+            loadInitialData();
+            setupThemeSelector();
+            setupAnimations();
+            
+            // Start animations
+            startBackgroundAnimations();
+            
+            // Set up intervals
+            setInterval(loadStatistics, 30000);
+            setInterval(updateConnectionStatus, 10000);
+            setInterval(updateLiveIndicators, 5000);
+        });
+        
+        // Setup theme selector
+        function setupThemeSelector() {
+            $('.theme-btn').click(function() {
+                const theme = $(this).data('theme');
+                changeTheme(theme);
+            });
+        }
+        
+        // Change theme
+        function changeTheme(theme) {
+            currentTheme = theme;
+            $('.theme-btn').removeClass('active');
+            $(`.theme-btn[data-theme="${theme}"]`).addClass('active');
+            
+            // Emit theme change to server
+            if (socket) {
+                socket.emit('change_theme', { theme: theme });
+            }
+            
+            // Show theme change animation
+            showToast('Theme Changed', `Switched to ${theme} theme`, 'info');
+        }
+        
+        // Setup animations
+        function setupAnimations() {
+            // Add hover effects to stat cards
+            $('.stat-card').hover(
+                function() {
+                    $(this).addClass('active');
+                },
+                function() {
+                    $(this).removeClass('active');
+                }
+            );
+            
+            // Add click effects to buttons
+            $('.btn-glow').click(function(e) {
+                const btn = $(this);
+                btn.addClass('animate__animated animate__pulse');
+                setTimeout(() => {
+                    btn.removeClass('animate__animated animate__pulse');
+                }, 1000);
+            });
+        }
+        
+        // Background animations
+        function startBackgroundAnimations() {
+            // Animate floating elements
+            animateFloatingElements();
+            
+            // Add random particles
+            createParticles();
+        }
+        
+        function animateFloatingElements() {
+            $('.floating-element').each(function(i) {
+                const elem = $(this);
+                const speed = 15 + (i * 5);
+                elem.css('animation', `float ${speed}s ease-in-out infinite`);
+            });
+        }
+        
+        function createParticles() {
+            // Simple particle-like animation
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    createParticle();
+                }
+            }, 1000);
+        }
+        
+        function createParticle() {
+            const colors = ['var(--primary)', 'var(--secondary)', 'var(--accent)'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const particle = $('<div class="particle"></div>').css({
+                position: 'fixed',
+                width: '5px',
+                height: '5px',
+                background: color,
+                borderRadius: '50%',
+                pointerEvents: 'none',
+                zIndex: 1,
+                left: Math.random() * 100 + 'vw',
+                top: '-10px',
+                boxShadow: `0 0 10px ${color}, 0 0 20px ${color}`
+            });
+            
+            $('body').append(particle);
+            
+            particle.animate({
+                top: '100vh',
+                opacity: 0
+            }, 3000, function() {
+                $(this).remove();
+            });
+        }
+        
+        // Initialize charts with animations
+        function initializeCharts() {
+            // Platform Distribution Chart
+            const platformCtx = document.getElementById('platformChart').getContext('2d');
+            charts.platformChart = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook', 'WhatsApp', 'Instagram'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            '{{ platform_colors.facebook }}',
+                            '{{ platform_colors.whatsapp }}',
+                            '{{ platform_colors.instagram }}'
+                        ],
+                        borderWidth: 2,
+                        borderColor: 'var(--card)',
+                        hoverOffset: 20,
+                        hoverBackgroundColor: [
+                            '{{ platform_colors.facebook }}',
+                            '{{ platform_colors.whatsapp }}',
+                            '{{ platform_colors.instagram }}'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--text)',
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    family: "'Segoe UI', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(20, 20, 32, 0.9)',
+                            titleColor: 'var(--text)',
+                            bodyColor: 'var(--text)',
+                            borderColor: 'var(--primary)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Country Chart
+            const countryCtx = document.getElementById('countryChart').getContext('2d');
+            charts.countryChart = new Chart(countryCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'SMS Count',
+                        data: [],
+                        backgroundColor: 'var(--primary)',
+                        borderColor: 'var(--secondary)',
+                        borderWidth: 2,
+                        borderRadius: 10,
+                        hoverBackgroundColor: 'var(--accent)',
+                        hoverBorderColor: 'var(--primary)',
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'var(--muted)',
+                                maxRotation: 45,
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'var(--muted)',
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', sans-serif"
+                                },
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Hourly Activity Chart
+            const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+            charts.hourlyChart = new Chart(hourlyCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Facebook',
+                            data: [],
+                            borderColor: '{{ platform_colors.facebook }}',
+                            backgroundColor: 'rgba(24, 119, 242, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '{{ platform_colors.facebook }}',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'WhatsApp',
+                            data: [],
+                            borderColor: '{{ platform_colors.whatsapp }}',
+                            backgroundColor: 'rgba(37, 211, 102, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '{{ platform_colors.whatsapp }}',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Instagram',
+                            data: [],
+                            borderColor: '{{ platform_colors.instagram }}',
+                            backgroundColor: 'rgba(228, 64, 95, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '{{ platform_colors.instagram }}',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--text)',
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'var(--muted)',
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'var(--muted)',
+                                font: {
+                                    size: 11,
+                                    family: "'Segoe UI', sans-serif"
+                                }
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Connect to WebSocket with enhanced animations
+        function connectWebSocket() {
+            const statusElement = $('#connectionStatus');
+            
+            socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 10,
+                reconnectionDelay: 1000,
+                timeout: 20000
+            });
+            
+            socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+                isConnected = true;
+                updateConnectionStatus(true);
+                showToast('Connected', 'Successfully connected to real-time data stream', 'success');
+                
+                // Connection animation
+                statusElement.addClass('animate__animated animate__pulse');
+                setTimeout(() => {
+                    statusElement.removeClass('animate__animated animate__pulse');
+                }, 2000);
+                
+                socket.emit('request_update');
+            });
+            
+            socket.on('connection_status', (data) => {
+                updateConnectionStatus(data.status === 'connected');
+            });
+            
+            socket.on('new_sms', (data) => {
+                console.log('New SMS received with animation:', data.animation);
+                handleNewSMS(data);
+                updateLastUpdated();
+                
+                // Play platform-specific animation
+                playSMSAnimation(data);
+            });
+            
+            socket.on('initial_data', (data) => {
+                console.log('Initial data received');
+                updateDashboard(data);
+                
+                // Initial load animation
+                $('.stat-card').addClass('animate__animated animate__fadeInUp');
+                setTimeout(() => {
+                    $('.stat-card').removeClass('animate__animated animate__fadeInUp');
+                }, 2000);
+            });
+            
+            socket.on('data_update', (data) => {
+                updateStatisticsDisplay(data);
+                
+                // Batch animation
+                if (data.animations) {
+                    playBatchAnimation(data.animations);
+                }
+            });
+            
+            socket.on('batch_animation', (data) => {
+                playBatchAnimation(data.platform_breakdown);
+            });
+            
+            socket.on('refresh_animation', (data) => {
+                playRefreshAnimation(data);
+            });
+            
+            socket.on('clear_animation', () => {
+                playClearAnimation();
+            });
+            
+            socket.on('theme_changed', (data) => {
+                updateTheme(data);
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from WebSocket server');
+                isConnected = false;
+                updateConnectionStatus(false);
+                showToast('Disconnected', 'Lost connection to server', 'warning');
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                isConnected = false;
+                updateConnectionStatus(false);
+                showToast('Connection Error', 'Failed to connect to server', 'error');
+            });
+        }
+        
+        // Play SMS animation
+        function playSMSAnimation(sms) {
+            const platform = sms.platform;
+            const animation = sms.animation || 'slideInRight';
+            
+            // Platform-specific color flash
+            const colorMap = {
+                'facebook': '{{ platform_colors.facebook }}',
+                'whatsapp': '{{ platform_colors.whatsapp }}',
+                'instagram': '{{ platform_colors.instagram }}'
+            };
+            
+            // Add flash effect to platform card
+            $(`.stat-card[data-platform="${platform}"]`).addClass('animate__animated animate__pulse');
+            setTimeout(() => {
+                $(`.stat-card[data-platform="${platform}"]`).removeClass('animate__animated animate__pulse');
+            }, 1000);
+            
+            // Show floating notification
+            showFloatingNotification(sms);
+        }
+        
+        // Play batch animation
+        function playBatchAnimation(animations) {
+            Object.keys(animations).forEach(platform => {
+                if (animations[platform] > 0) {
+                    // Animate platform counter
+                    const count = animations[platform];
+                    const counter = $(`#${platform}Count`);
+                    counter.addClass('animate__animated animate__bounce');
+                    setTimeout(() => {
+                        counter.removeClass('animate__animated animate__bounce');
+                    }, 1000);
+                    
+                    // Show mini notification
+                    showMiniNotification(platform, count);
+                }
+            });
+        }
+        
+        // Play refresh animation
+        function playRefreshAnimation(data) {
+            // Pulse all stat cards
+            $('.stat-card').addClass('animate__animated animate__pulse');
+            setTimeout(() => {
+                $('.stat-card').removeClass('animate__animated animate__pulse');
+            }, 1000);
+            
+            // Show refresh notification
+            showToast('Data Refreshed', `Loaded ${data.count} new SMS`, 'info');
+        }
+        
+        // Play clear animation
+        function playClearAnimation() {
+            // Fade out all SMS rows
+            $('#smsTableBody tr').addClass('animate__animated animate__fadeOut');
+            setTimeout(() => {
+                $('#smsTableBody').empty();
+            }, 500);
+            
+            // Reset counters with animation
+            $('.stat-number').addClass('animate__animated animate__fadeOut');
+            setTimeout(() => {
+                $('.stat-number').removeClass('animate__animated animate__fadeOut');
+                updateCounts();
+            }, 500);
+        }
+        
+        // Show floating notification
+        function showFloatingNotification(sms) {
+            const colors = {
+                'facebook': '{{ platform_colors.facebook }}',
+                'whatsapp': '{{ platform_colors.whatsapp }}',
+                'instagram': '{{ platform_colors.instagram }}'
+            };
+            
+            const notification = $(`
+                <div class="floating-notification" style="
+                    position: fixed;
+                    background: ${colors[sms.platform]};
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 50px;
+                    font-size: 12px;
+                    z-index: 10000;
+                    right: 20px;
+                    top: 100px;
+                    opacity: 0;
+                    transform: translateX(100px);
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                ">
+                    <i class="fab fa-${sms.platform} me-2"></i>
+                    New ${sms.platform} SMS
+                </div>
+            `);
+            
+            $('body').append(notification);
+            
+            notification.animate({
+                opacity: 1,
+                transform: 'translateX(0)'
+            }, 300, function() {
+                setTimeout(() => {
+                    notification.animate({
+                        opacity: 0,
+                        transform: 'translateX(100px)'
+                    }, 300, function() {
+                        notification.remove();
+                    });
+                }, 2000);
+            });
+        }
+        
+        // Show mini notification
+        function showMiniNotification(platform, count) {
+            const badge = $(`.stat-card[data-platform="${platform}"] .stat-number`);
+            const originalText = badge.text();
+            
+            // Create notification bubble
+            const bubble = $(`
+                <span class="notification-bubble" style="
+                    position: absolute;
+                    background: var(--accent);
+                    color: white;
+                    border-radius: 50%;
+                    width: 25px;
+                    height: 25px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    font-weight: bold;
+                    top: -10px;
+                    right: -10px;
+                    animation: bounceIn 0.5s;
+                ">
+                    +${count}
+                </span>
+            `);
+            
+            badge.parent().append(bubble);
+            
+            setTimeout(() => {
+                bubble.animate({
+                    opacity: 0,
+                    transform: 'scale(0)'
+                }, 500, function() {
+                    bubble.remove();
+                });
+            }, 2000);
+        }
+        
+        // Update connection status with animation
+        function updateConnectionStatus(connected = null) {
+            const statusElement = $('#connectionStatus');
+            const indicator = statusElement.find('.status-indicator');
+            const text = $('#connectionText');
+            
+            if (connected === null) {
+                $.ajax({
+                    url: '/api/status',
+                    method: 'GET',
+                    timeout: 5000,
+                    success: function(data) {
+                        if (data.logged_in) {
+                            indicator.removeClass('status-disconnected').addClass('status-connected');
+                            text.text('Connected to IVAS');
+                            statusElement.css('background', 'rgba(0, 255, 136, 0.1)');
+                        } else {
+                            indicator.removeClass('status-connected').addClass('status-disconnected');
+                            text.text('Not logged in');
+                            statusElement.css('background', 'rgba(255, 56, 96, 0.1)');
+                        }
+                    },
+                    error: function() {
+                        indicator.removeClass('status-connected').addClass('status-disconnected');
+                        text.text('API Error');
+                        statusElement.css('background', 'rgba(255, 56, 96, 0.1)');
+                    }
+                });
+            } else if (connected) {
+                indicator.removeClass('status-disconnected').addClass('status-connected');
+                text.text('Connected to IVAS');
+                statusElement.css('background', 'rgba(0, 255, 136, 0.1)');
+                
+                // Connection animation
+                statusElement.addClass('animate__animated animate__pulse');
+                setTimeout(() => {
+                    statusElement.removeClass('animate__animated animate__pulse');
+                }, 1000);
+            } else {
+                indicator.removeClass('status-connected').addClass('status-disconnected');
+                text.text('Disconnected');
+                statusElement.css('background', 'rgba(255, 56, 96, 0.1)');
+            }
+        }
+        
+        // Update live indicators
+        function updateLiveIndicators() {
+            if (isConnected) {
+                // Pulse live indicator
+                $('.realtime-indicator').addClass('animate__animated animate__pulse');
+                setTimeout(() => {
+                    $('.realtime-indicator').removeClass('animate__animated animate__pulse');
+                }, 1000);
+            }
+        }
+        
+        // Load initial data with animations
+        function loadInitialData() {
+            // Loading animation
+            showLoadingAnimation();
+            
+            // Load SMS data
+            $.ajax({
+                url: '/api/live-sms',
+                method: 'GET',
+                data: { limit: 100 },
+                success: function(data) {
+                    if (data.success) {
+                        allSmsData = data.data;
+                        updateSmsTable(allSmsData);
+                        $('#totalSms').text(data.total);
+                        updateLastUpdated(data.last_update);
+                        
+                        // Success animation
+                        hideLoadingAnimation();
+                        showSuccessAnimation();
+                    }
+                },
+                error: function() {
+                    showToast('Error', 'Failed to load SMS data', 'error');
+                    hideLoadingAnimation();
+                }
+            });
+            
+            // Load statistics
+            loadStatistics();
+        }
+        
+        // Show loading animation
+        function showLoadingAnimation() {
+            // Add shimmer effect to cards
+            $('.stat-card').each(function() {
+                const card = $(this);
+                card.append('<div class="shimmer"></div>');
+            });
+        }
+        
+        // Hide loading animation
+        function hideLoadingAnimation() {
+            $('.shimmer').remove();
+        }
+        
+        // Show success animation
+        function showSuccessAnimation() {
+            // Bounce all stat cards
+            $('.stat-card').addClass('animate__animated animate__bounce');
+            setTimeout(() => {
+                $('.stat-card').removeClass('animate__animated animate__bounce');
+            }, 1000);
+        }
+        
+        // Load statistics with animations
+        function loadStatistics() {
+            $.ajax({
+                url: '/api/statistics',
+                method: 'GET',
+                success: function(data) {
+                    if (data.success) {
+                        updateStatistics(data);
+                        updateCharts(data);
+                        updateTopCountries(data.top_countries);
+                        updateAnalytics(data.analytics);
+                        
+                        // Update theme if changed
+                        if (data.theme && data.theme !== currentTheme) {
+                            updateTheme(data);
+                        }
+                    }
+                },
+                error: function() {
+                    console.error('Failed to load statistics');
+                }
+            });
+        }
+        
+        // Handle new SMS with animation
+        function handleNewSMS(sms) {
+            // Add to beginning of array
+            allSmsData.unshift(sms);
+            
+            // Keep only last 1000 messages
+            if (allSmsData.length > 1000) {
+                allSmsData = allSmsData.slice(0, 1000);
+            }
+            
+            // Update table with animation
+            if (currentFilter === 'all' || currentFilter === sms.platform) {
+                addSmsToTable(sms, true);
+            }
+            
+            // Update statistics with animation
+            updateCounts();
+            
+            // Update total count with animation
+            const totalElement = $('#totalSms');
+            totalElement.addClass('animate__animated animate__bounce');
+            setTimeout(() => {
+                totalElement.removeClass('animate__animated animate__bounce');
+                totalElement.text(allSmsData.length);
+            }, 500);
+            
+            // Update last updated time
+            updateLastUpdated();
+        }
+        
+        // Add SMS to table with animation
+        function addSmsToTable(sms, prepend = false) {
+            const tbody = $('#smsTableBody');
+            const loadingRow = $('#smsTableBody tr:first-child');
+            
+            // Remove loading row if it exists
+            if (loadingRow.text().includes('Connecting')) {
+                loadingRow.remove();
+            }
+            
+            // Create platform badge
+            let badgeClass = '';
+            let badgeIcon = '';
+            let platformText = '';
+            
+            switch(sms.platform) {
+                case 'facebook':
+                    badgeClass = 'badge-facebook';
+                    badgeIcon = 'fa-facebook';
+                    platformText = 'Facebook';
+                    break;
+                case 'whatsapp':
+                    badgeClass = 'badge-whatsapp';
+                    badgeIcon = 'fa-whatsapp';
+                    platformText = 'WhatsApp';
+                    break;
+                case 'instagram':
+                    badgeClass = 'badge-instagram';
+                    badgeIcon = 'fa-instagram';
+                    platformText = 'Instagram';
+                    break;
+            }
+            
+            // Get flag emoji
+            const flagEmoji = getFlagEmoji(sms.country_code);
+            
+            // Create table row with animation class
+            const row = $(`
+                <tr class="sms-entry animate__animated animate__${sms.animation || 'slideInRight'}">
+                    <td>
+                        <span class="badge-platform ${badgeClass}">
+                            <i class="fab ${badgeIcon} me-1"></i>
+                            ${platformText}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="country-flag">${flagEmoji}</span>
+                            <span>${sms.country}</span>
+                        </div>
+                    </td>
+                    <td><code class="sid-code">${sms.sid || 'N/A'}</code></td>
+                    <td><small>${sms.phone_number || 'N/A'}</small></td>
+                    <td>
+                        <div class="sms-message" title="${sms.message}">
+                            ${sms.message || 'No message'}
+                        </div>
+                    </td>
+                    <td><small class="text-muted">${sms.time || '--:--:--'}</small></td>
+                </tr>
+            `);
+            
+            if (prepend) {
+                tbody.prepend(row);
+                
+                // Keep only 100 rows in view
+                if (tbody.children().length > 100) {
+                    tbody.children().last().remove();
+                }
+                
+                // Add highlight animation
+                row.addClass('highlight-row');
+                setTimeout(() => {
+                    row.removeClass('highlight-row');
+                    row.removeClass('animate__animated');
+                }, 1000);
+            } else {
+                tbody.append(row);
+                row.removeClass('animate__animated');
+            }
+            
+            // Update count
+            $('#smsCount').text(tbody.children().length);
+        }
+        
+        // Update SMS table
+        function updateSmsTable(smsList) {
+            const tbody = $('#smsTableBody');
+            const loadingRow = tbody.find('tr:first-child');
+            
+            // Clear existing rows with animation
+            if (!loadingRow.text().includes('Connecting')) {
+                tbody.find('tr').addClass('animate__animated animate__fadeOut');
+                setTimeout(() => {
+                    tbody.empty();
+                    smsList.forEach(sms => addSmsToTable(sms, false));
+                }, 500);
+            } else {
+                loadingRow.remove();
+                smsList.forEach(sms => addSmsToTable(sms, false));
+            }
+        }
+        
+        // Update statistics with animations
+        function updateStatistics(data) {
+            if (data.platform_stats) {
+                // Animate each counter
+                ['facebook', 'whatsapp', 'instagram'].forEach(platform => {
+                    const stat = data.platform_stats[platform];
+                    const countElement = $(`#${platform}Count`);
+                    const percentElement = $(`#${platform}Percentage`);
+                    const progressElement = $(`.${platform}-progress`);
+                    
+                    // Animate counter
+                    animateCounter(countElement[0], 0, stat.count, 1000);
+                    
+                    // Update percentage
+                    percentElement.text(stat.percentage.toFixed(1) + '%');
+                    
+                    // Animate progress bar
+                    progressElement.animate({ width: stat.percentage + '%' }, 1000);
+                    
+                    // Add color to progress bar
+                    progressElement.css('background', stat.gradient);
+                });
+            }
+        }
+        
+        // Animate counter
+        function animateCounter(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Update statistics display
+        function updateStatisticsDisplay(data) {
+            updateCounts();
+        }
+        
+        // Update counts from allSmsData
+        function updateCounts() {
+            const counts = {
+                facebook: allSmsData.filter(sms => sms.platform === 'facebook').length,
+                whatsapp: allSmsData.filter(sms => sms.platform === 'whatsapp').length,
+                instagram: allSmsData.filter(sms => sms.platform === 'instagram').length
+            };
+            
+            const total = counts.facebook + counts.whatsapp + counts.instagram;
+            
+            // Update platform chart with animation
+            if (charts.platformChart && total > 0) {
+                charts.platformChart.data.datasets[0].data = [
+                    counts.facebook,
+                    counts.whatsapp,
+                    counts.instagram
+                ];
+                charts.platformChart.update();
+            }
+        }
+        
+        // Update charts with animations
+        function updateCharts(data) {
+            // Update platform chart
+            if (data.platform_stats && charts.platformChart) {
+                charts.platformChart.data.datasets[0].data = [
+                    data.platform_stats.facebook.count,
+                    data.platform_stats.whatsapp.count,
+                    data.platform_stats.instagram.count
+                ];
+                charts.platformChart.update('active');
+            }
+            
+            // Update country chart
+            if (data.top_countries && charts.countryChart) {
+                const countries = Object.keys(data.top_countries).slice(0, 10);
+                const counts = Object.values(data.top_countries).slice(0, 10);
+                
+                charts.countryChart.data.labels = countries;
+                charts.countryChart.data.datasets[0].data = counts;
+                charts.countryChart.update('active');
+            }
+            
+            // Update hourly chart
+            if (data.hourly_stats && charts.hourlyChart) {
+                const hours = data.hourly_stats.map(item => item.hour);
+                const facebookData = data.hourly_stats.map(item => item.facebook);
+                const whatsappData = data.hourly_stats.map(item => item.whatsapp);
+                const instagramData = data.hourly_stats.map(item => item.instagram);
+                
+                charts.hourlyChart.data.labels = hours;
+                charts.hourlyChart.data.datasets[0].data = facebookData;
+                charts.hourlyChart.data.datasets[1].data = whatsappData;
+                charts.hourlyChart.data.datasets[2].data = instagramData;
+                charts.hourlyChart.update('active');
+            }
+        }
+        
+        // Update top countries
+        function updateTopCountries(countryData) {
+            const container = $('#topCountriesList');
+            const countries = Object.entries(countryData || {})
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            // This function is now handled by the chart
+        }
+        
+        // Update analytics
+        function updateAnalytics(analytics) {
+            $('#smsRate').text(analytics.sms_rate.toFixed(1) + '/min');
+            $('#countryCount').text(Object.keys(analytics.trending_countries || {}).length);
+            
+            // Update peak hours
+            const peakHoursElement = $('#peakHours');
+            if (analytics.peak_hours && analytics.peak_hours.length > 0) {
+                let html = '';
+                analytics.peak_hours.forEach(([hour, count]) => {
+                    html += `<div class="d-flex justify-content-between mb-2">
+                        <span>${hour}</span>
+                        <span class="text-primary">${count} SMS</span>
+                    </div>`;
+                });
+                peakHoursElement.html(html);
+            }
+        }
+        
+        // Update theme
+        function updateTheme(data) {
+            if (data.theme && data.theme !== currentTheme) {
+                currentTheme = data.theme;
+                showToast('Theme Updated', `Changed to ${data.theme} theme`, 'info');
+                // In a real app, you would update CSS variables here
+            }
+        }
+        
+        // Filter SMS by platform
+        function filterSMS(platform) {
+            currentFilter = platform;
+            
+            // Update active button with animation
+            $('.btn-group .btn').removeClass('active');
+            const activeBtn = $(event.target);
+            activeBtn.addClass('active');
+            activeBtn.addClass('animate__animated animate__pulse');
+            setTimeout(() => {
+                activeBtn.removeClass('animate__animated animate__pulse');
+            }, 500);
+            
+            // Filter table with animation
+            const tbody = $('#smsTableBody');
+            tbody.find('tr').addClass('animate__animated animate__fadeOut');
+            
+            setTimeout(() => {
+                tbody.empty();
+                
+                const filteredData = allSmsData.filter(sms => {
+                    if (platform === 'all') return true;
+                    return sms.platform === platform;
+                });
+                
+                filteredData.slice(0, 100).forEach((sms, index) => {
+                    setTimeout(() => {
+                        addSmsToTable(sms, false);
+                    }, index * 50);
+                });
+            }, 500);
+        }
+        
+        // Refresh data manually with animation
+        function refreshData() {
+            // Add loading animation to button
+            const btn = $(event.target).closest('.btn-glow');
+            btn.addClass('animate__animated animate__rotateIn');
+            
+            $.ajax({
+                url: '/api/refresh',
+                method: 'GET',
+                beforeSend: function() {
+                    showToast('Refreshing', 'Fetching latest SMS data...', 'info');
+                },
+                success: function(data) {
+                    if (data.success) {
+                        showToast('Refreshed', data.message, 'success');
+                        updateLastUpdated();
+                        
+                        // Animate new counts
+                        if (data.animations) {
+                            playBatchAnimation(data.animations);
+                        }
+                    } else {
+                        showToast('Error', data.error || 'Refresh failed', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Error', 'Failed to refresh data', 'error');
+                },
+                complete: function() {
+                    setTimeout(() => {
+                        btn.removeClass('animate__animated animate__rotateIn');
+                    }, 1000);
+                }
+            });
+        }
+        
+        // Toggle auto refresh
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const btn = $('#autoRefreshBtn');
+            
+            if (autoRefresh) {
+                btn.html('<i class="fas fa-play me-2"></i> Auto');
+                btn.removeClass('btn-secondary').addClass('btn-success');
+                showToast('Auto Refresh', 'Auto refresh enabled', 'success');
+            } else {
+                btn.html('<i class="fas fa-stop me-2"></i> Auto');
+                btn.removeClass('btn-success').addClass('btn-secondary');
+                showToast('Auto Refresh', 'Auto refresh disabled', 'warning');
+            }
+        }
+        
+        // Update last updated time
+        function updateLastUpdated(timestamp = null) {
+            let timeString;
+            
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeString = date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            } else {
+                const now = new Date();
+                timeString = now.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            }
+            
+            const element = $('#lastUpdated');
+            element.addClass('animate__animated animate__pulse');
+            setTimeout(() => {
+                element.removeClass('animate__animated animate__pulse');
+                element.text(timeString);
+            }, 500);
+        }
+        
+        // Show toast notification
+        function showToast(title, message, type = 'info') {
+            const container = $('#toastContainer');
+            const typeIcons = {
+                'success': 'fas fa-check-circle',
+                'error': 'fas fa-times-circle',
+                'warning': 'fas fa-exclamation-triangle',
+                'info': 'fas fa-info-circle'
+            };
+            
+            const typeColors = {
+                'success': '{{ colors.success }}',
+                'error': '{{ colors.danger }}',
+                'warning': '{{ colors.warning }}',
+                'info': '{{ colors.primary }}'
+            };
+            
+            const toastId = 'toast-' + Date.now();
+            const toast = $(`
+                <div class="toast-notification" id="${toastId}" style="border-left: 4px solid ${typeColors[type]};">
+                    <div class="d-flex align-items-center">
+                        <i class="${typeIcons[type]} fa-lg me-3" style="color: ${typeColors[type]}"></i>
+                        <div>
+                            <strong class="d-block">${title}</strong>
+                            <p class="mb-0">${message}</p>
+                        </div>
+                        <button class="btn-close btn-close-white ms-3" onclick="$(this).closest('.toast-notification').remove()"></button>
+                    </div>
+                </div>
+            `);
+            
+            container.append(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                const toastElement = $(`#${toastId}`);
+                if (toastElement.length) {
+                    toastElement.addClass('hide');
+                    setTimeout(() => toastElement.remove(), 500);
+                }
+            }, 5000);
+        }
+        
+        // Get flag emoji from country code
+        function getFlagEmoji(countryCode) {
+            if (!countryCode || countryCode.length !== 2) return '🌐';
+            
+            const codePoints = countryCode.toUpperCase()
+                .split('')
+                .map(char => 127397 + char.charCodeAt());
+            
+            return String.fromCodePoint(...codePoints);
+        }
+        
+        // Country data for JavaScript
+        const COUNTRIES = {{ COUNTRIES|tojson }};
+    </script>
+</body>
+</html>
