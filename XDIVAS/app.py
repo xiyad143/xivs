@@ -181,13 +181,14 @@ def load_cookies():
     except FileNotFoundError:
         logger.error("cookies.json file not found!")
         cookies = {
-            "_fbp": "fb.1.1768553685476.5929208535090025",
-            "_ga": "GA1.2.1282339504.1768553686",
-            "_gid": "GA1.2.1162767864.1768553686",
-            "cf_clearance": "ILaH9lGVOZwc5OVuzHkis5JVAIzefg2CbjDXmRKhf5Q-1768604174-1.2.1.1-GILKVA2MMulh.E49Ny75qyRNNvSIr_mdsL7qz79HQ40rR8gQGmLq.FjtQ1lSoVyzi8oe848Q6V2gM9xJrO.RA7EN1W2ChGY3KuB.Cdbf1u2UGipDRzMp1y5x03xnBLyGWN29hQY2hDpfC6zJCzjksTb8F3V2oeBzLwa4ukuiIdyEH_KyZuDyhsyImj3yLNf5Z8lr_q0AurZ1BiGyxhTkGU8VDNasWv5eEuhxrRg0yfU",
-            "XSRF-TOKEN": "eyJpdiI6IjN2TjJ2a25ZaUNjRy9JeHdFRGNvUGc9PSIsInZhbHVlIjoiMnh1dXlEdnFubWpnenYvbGVsWmVtdmNORnROWUxzTlMvelc4RzJZR21QN2E3RHlkd0VtVWc2VHluK3ZtdktMcGlPbm4zMlgxZWtlekdGUFNPUVB3TDdEZFVkUXBGbENqQVNsTSs3cGRISDduWSsrMTFzZ1RaVU5Ec3pScXVOUEsiLCJtYWMiOiI5MDQzNjFhNDdiOTY1MmM0MDdkZTJlYmFkZGVmNWI4MmM2NTFiOWFkMDA1YjY3YzQ5Y2I2ZTg3YWFhZjg2MjljIiwidGFnIjoiIn0=",
-            "ivas_sms_session": "eyJpdiI6IkIwK0taN0dSN0pBKzhUOXllcW1vcEE9PSIsInZhbHVlIjoibkRPOGUyaExGelEzU2lvSmxlYnBrbWNzZ2QyNjRPY1h3ang2dzRaUUxYRndXTnRnSlI2RkV1aTVqbkRaZDZkb2FOa3RRWVduRGlQYTQxdWFJSVhDUVQvRDFuRW1WeXJQdFhTeWJhbjh0M0N2NVM1TFFLUGNPVzhjeWRTNE90a2giLCJtYWMiOiJlMjE2NzA4YTdmNGVlODBmMTU5N2JmMzY4NDIyNTAzMzJlOTZkNmNmMzAzZmI3ODhhY2ZhNDQwMzYxNjNlMjRjIiwidGFnIjoiIn0="
-        }
+    '_fbp': 'fb.1.1768553685476.5929208535090025',
+    '_ga': 'GA1.2.1282339504.1768553686',
+    'cf_clearance': '4TUB_D1zBiTvjIbuBNdvsXfqOL8NnVimSWblcFKMSYA-1768697580-1.2.1.1-6w0xf6Z2wy3XhOv7b7j1wkrzWMqXiAQ2UPTnRjT0Tg7rrF.eGhxVlTozjqO5om6FPfT4s5te4v0PzF0pS7b7DVUxlaoDoQ.CUmzGWs6..jKXRL66C.YsdVABkIvpbYB4NJYCKP4ee2NpAuP7OE7DICKnhLQd3uf23J.cJ923fTCMQFFs5YQ4vCS6KthoBX0bL.5cKUiAIMz.gUL_PzZjB1et8PpJ4h9ArjkUjLzWhDM',
+    '_gid': 'GA1.2.557442583.1768697998',
+    '_gat_gtag_UA_191466370_1': '1',
+    'XSRF-TOKEN': 'eyJpdiI6InlKRDRHeCtLSHVCMVBqWW92SURVUEE9PSIsInZhbHVlIjoieHRxWXdCM2ZhNG9MdEJBby9DZlpWS3JCZVcvSC9jUmxCdE5wcHNmZFJ2VXRPTEJXeVVGM2I5K0JGMGlONTMreHRmOFJQQWpNaGdsZmliWE1nSzBlQkFKM2lpQWxwajFwcnFtY2x2K0tPZkZBQ2N5OGppRUJDaE0ySUxEUytXTFIiLCJtYWMiOiI3MmJjYmVhZTIzNzlkZTllNmIzMWYyZjIxNjZlODFkZjUzYjFmYzhhOGNjNmJkNGM4MWQxNjI5ZjIyMTA0M2EyIiwidGFnIjoiIn0%3D',
+    'ivas_sms_session': 'eyJpdiI6IitVQ1BuNjdKQVZKeVh3b0taQm9UY1E9PSIsInZhbHVlIjoiZ0I0bDhVaE45cE05d3JQM09tc1owVzQ1alVzSFJqaG1JZjFxUW41K0MycHc1Z3hzMlpqWmRyVCtLR1NZa3lhMkV5NWw3MlBaSVJqL1BhZWN5eVByTU1Ca1BJSHFOR1FmK3RUTW11clcxUkVZQVkrMTNkQnRnckhTbCt4TkJDTTQiLCJtYWMiOiI4NGZjOTQyNmU3NzA1ZTFmYjllYTljYzg3MGY3MTQyYzc4Njg1NjZhZWM5NjhiYTBlZmY3OTE1Y2U0ZTc3MTdkIiwidGFnIjoiIn0%3D',
+}
     except Exception as e:
         logger.error(f"Error loading cookies: {e}")
         cookies = {}
@@ -971,4 +972,5 @@ if __name__ == '__main__':
                  port=5000, 
                  host='0.0.0.0',
                  allow_unsafe_werkzeug=True,
+
                  log_output=True)
